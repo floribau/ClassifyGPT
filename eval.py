@@ -1,35 +1,36 @@
+import pandas
 from sklearn.metrics import f1_score
 
 
-def micro_f1_score(y_true, y_pred):
+def micro_f1_score(y_true: pandas.Series, y_pred: pandas.Series) -> float:
     """
     Calculates the micro f1 score for the given predictions.
 
-    :param y_true: Pandas Series: the correct labels
-    :param y_pred: Pandas Series: the predicted labels
-    :return: Float: micro f1 score
+    :param y_true: the correct labels
+    :param y_pred: the predicted labels
+    :return: micro f1 score
     """
     return f1_score(y_true, y_pred, average='micro')
 
 
-def macro_f1_score(y_true, y_pred):
+def macro_f1_score(y_true: pandas.Series, y_pred: pandas.Series) -> float:
     """
     Calculates the macro f1 score for the given predictions.
 
-    :param y_true: Pandas Series: the correct labels
-    :param y_pred: Pandas Series: the predicted labels
-    :return: Float: macro f1 score
+    :param y_true: the correct labels
+    :param y_pred: the predicted labels
+    :return: macro f1 score
     """
     return f1_score(y_true, y_pred, average='macro')
 
 
-def eval_f1_scores(paths_true, paths_pred):
+def eval_f1_scores(paths_true: pandas.Series, paths_pred: pandas.Series) -> dict:
     """
     Calculates micro and macro f1 scores for the category paths, second-level categories, and third-level categories.
 
-    :param paths_true: Pandas Series: the correct paths
-    :param paths_pred: Pandas Series: the predicted paths
-    :return: dict with all six f1 scores. Keys: Paths Micro F1, Paths Macro F1, Second-Level Micro F1,
+    :param paths_true: the correct paths
+    :param paths_pred: the predicted paths
+    :return: Results for all six f1 scores. Keys: Paths Micro F1, Paths Macro F1, Second-Level Micro F1,
     Second-Level Macro F1, Third-Level Micro F1, Third-Level Macro F1
     """
     try:
