@@ -1,0 +1,29 @@
+from collections import Counter
+from enum import Enum
+
+
+class ExperimentType(Enum):
+    """
+    Represents the different experiment types.
+
+    Baseline: single greedy CoT prompt
+    Self-Consistency: applies Self-Consistency, path is chosen through majority vote
+    Shuffle-Choices: shuffles label order, path is chosen through majority vote
+    Combines: applies Self-Consistency and Shuffle-Choices, path is chosen through majority vote
+    """
+    BASELINE = 1
+    SELF_CONSISTENCY = 2
+    CHOICE_SHUFFLING = 3
+    COMBINED = 4
+
+
+def most_common_string(strings: list):
+    """
+    Returns the String that occurs most often in a list of strings.
+
+    :param strings: the list of strings
+    :return: string occurring the most
+    """
+    counts = Counter(strings)
+    most_common = max(counts, key=counts.get)
+    return most_common
