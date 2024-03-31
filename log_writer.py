@@ -15,7 +15,7 @@ class LogWriter:
 
         self.log_file = open(logfile_name, "w")
 
-    def write(self, message):
+    def write(self, message: str):
         """
         Writes to the log file
 
