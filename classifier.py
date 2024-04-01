@@ -43,16 +43,16 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
         response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
                                    with_description)
         response_string = response.choices[0].message.content.strip()
-        predicted_path = extract_response_path(response_string)
+        majority_path = extract_response_path(response_string)
 
-        while predicted_path == -1:
+        while majority_path == -1:
             logwriter.write_to_log(f"Response path format incorrect for response: {response}")
             response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
                                        with_description)
             response_string = response.choices[0].message.content.strip()
-            predicted_path = extract_response_path(response_string)
+            majority_path = extract_response_path(response_string)
 
-        result_dataset.loc[row_index, 'Predicted Path'] = predicted_path
+        result_dataset.loc[row_index, 'Predicted Path'] = majority_path
         result_dataset.loc[row_index, 'Response'] = response_string
 
     elif experiment_type == ExperimentType.SELF_CONSISTENCY:
@@ -116,8 +116,8 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
 
                 while predicted_path == -1:
                     logwriter.write_to_log(f"Response path format incorrect for response: {response}")
-                    response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
-                                               with_description)
+                    response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS,
+                                               data.THIRD_LEVEL_LABELS, with_description)
                     response_string = response.choices[0].message.content.strip()
                     predicted_path = extract_response_path(response_string)
 
@@ -132,6 +132,7 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
     else:
         raise ValueError(f"Unknown experiment type {experiment_type}")
 
+    logwriter.write_to_log(f"Final Response: {majority_path}\n")
     return result_dataset
 
 
@@ -154,6 +155,7 @@ def classify(experiment_type: ExperimentType, test_data: pd.DataFrame, with_desc
     logwriter.write_to_log("-"*50 + "\n")
 
     result_dataset = pd.DataFrame(test_data)
+    data.save_as_csv(result_dataset, experiment_type, with_description)
     try:
         for i in test_data.index:
             product_name = result_dataset.iloc[i]['Title']

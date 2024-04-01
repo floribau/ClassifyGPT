@@ -1,7 +1,7 @@
 import classifier
 import data
-import util
+from util import ExperimentType
 
 test_data = data.test_dataset
-experiment_type = util.ExperimentType.BASELINE
+experiment_type = ExperimentType.BASELINE
 classifier.classify(experiment_type, test_data)
