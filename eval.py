@@ -24,7 +24,7 @@ def macro_f1_score(y_true: pandas.Series, y_pred: pandas.Series) -> float:
     return f1_score(y_true, y_pred, average='macro')
 
 
-def eval_f1_scores(paths_true: pandas.Series, paths_pred: pandas.Series) -> dict:
+def eval_f1_scores(paths_true: pandas.Series, paths_pred: pandas.Series) -> dict[str: float]:
     """
     Calculates micro and macro f1 scores for the category paths, second-level categories, and third-level categories.
 

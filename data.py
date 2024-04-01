@@ -193,7 +193,7 @@ USER_PROMPT_TEMPLATE_5 = ("It is crucial that the answer path exactly matches th
                           "Devices>Keyboards\"")
 
 
-def format_user_prompt(title: str, brand: str, second_level_labels: list, third_level_labels: list,
+def format_user_prompt(title: str, brand: str, second_level_labels: list[str], third_level_labels: list[str],
                        with_definition: bool = False) -> str:
     """
     Assembles the user prompt templates and fills it with the given specifications.
@@ -222,7 +222,7 @@ def format_user_prompt(title: str, brand: str, second_level_labels: list, third_
     return formatted_string
 
 
-def permute_labels(labels: list) -> list:
+def permute_labels(labels: list[str]) -> list[str]:
     """
     Randomly permutes a list of labels.
 

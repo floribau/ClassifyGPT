@@ -1,5 +1,9 @@
 from collections import Counter
 from enum import Enum
+from log_writer import LogWriter
+
+log_writer = LogWriter()
+log_writer.write("Hello WOrld")
 
 
 class ExperimentType(Enum):
@@ -17,7 +21,7 @@ class ExperimentType(Enum):
     COMBINED = 4
 
 
-def most_common_string(strings: list):
+def most_common_string(strings: list[str]) -> str:
     """
     Returns the String that occurs most often in a list of strings.
 
