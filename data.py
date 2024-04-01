@@ -237,7 +237,7 @@ def permute_labels(labels: list[str]) -> list[str]:
 
 
 def save_as_csv(df: pd.DataFrame, experiment_type: ExperimentType, with_description: bool):
-    results_csv_name = "results_" + experiment_type.value + "_"
+    results_csv_name = "Results/results_" + experiment_type.value + "_"
     if with_description:
         results_csv_name = results_csv_name + "with_descriptions_"
     results_csv_name = results_csv_name + util.get_current_datetime() + ".csv"
