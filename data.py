@@ -237,7 +237,7 @@ def permute_labels(labels: list[str]) -> list[str]:
     return permuted_labels
 
 
-def save_as_csv(df: pd.DataFrame, experiment_type: ExperimentType, with_description: bool):
+def save_results_as_csv(df: pd.DataFrame, experiment_type: ExperimentType, with_description: bool):
     """
     Saves the given DataFrame as csv into the Results directory
 

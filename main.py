@@ -1,7 +1,13 @@
 import classifier
 import data
+import eval
 from util import ExperimentType
 
+# Classification
 test_data = data.test_dataset
 experiment_type = ExperimentType.BASELINE
-classifier.classify(experiment_type, test_data)
+result_data = classifier.classify(experiment_type, test_data)
+
+# Evaluation
+# TODO Store eval results
+print(eval.eval_f1_scores(result_data['Category Path'], result_data['Category Path']))

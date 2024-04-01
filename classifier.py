@@ -137,7 +137,8 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
     return result_dataset
 
 
-def classify(experiment_type: ExperimentType, test_data: pd.DataFrame, with_description: bool = False):
+def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_description: bool = False) \
+        -> pandas.DataFrame:
     """
     Performs the classification for the whole dataset by calling classify_single_row() for each row.
     The output is saved into a csv file
@@ -145,6 +146,7 @@ def classify(experiment_type: ExperimentType, test_data: pd.DataFrame, with_desc
     :param experiment_type: The experiment type as specified in util.ExperimentType
     :param test_data: The DataFrame containing the test data
     :param with_description: Adds label definitions to the prompt if True, doesn't add label definitions if False
+    :returns: result_dataset: The DataFrame containing the classification results
     """
     logwriter.open_log()
     logwriter.write_to_log("Starting Product Classification")
@@ -161,10 +163,12 @@ def classify(experiment_type: ExperimentType, test_data: pd.DataFrame, with_desc
             product_name = result_dataset.iloc[i]['Title']
             logwriter.write_to_log(f"--- {product_name} ---")
             result_dataset = classify_single_row(experiment_type, i, result_dataset, with_description)
-        data.save_as_csv(result_dataset, experiment_type, with_description)
+        data.save_results_as_csv(result_dataset, experiment_type, with_description)
     except Exception as e:
         logwriter.write_to_log(f"Exception caught: {e}")
-        data.save_as_csv(result_dataset, experiment_type, with_description)
+        data.save_results_as_csv(result_dataset, experiment_type, with_description)
+
+    return result_dataset
 
 
 def extract_response_path(response_string: str) -> str | int:
