@@ -1,5 +1,7 @@
 import pandas as pd
 import random
+import util
+from util import ExperimentType
 
 # Dataset consisting of 50 test samples.
 # They are classified into one of 25 category paths, each category path having two samples.
@@ -232,3 +234,12 @@ def permute_labels(labels: list[str]) -> list[str]:
     permuted_labels = labels[:]
     random.shuffle(permuted_labels)
     return permuted_labels
+
+
+def save_as_csv(df: pd.DataFrame, experiment_type: ExperimentType, with_description: bool):
+    results_csv_name = "results_" + experiment_type.value + "_"
+    if with_description:
+        results_csv_name = results_csv_name + "with_descriptions_"
+    results_csv_name = results_csv_name + util.get_current_datetime() + ".csv"
+
+    df.to_csv(results_csv_name, index_label="Index")

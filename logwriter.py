@@ -1,4 +1,4 @@
-import datetime
+import util
 
 logfile = None
 
@@ -8,9 +8,8 @@ def open_log():
     Opens a log file and sets the global parameter to this new log file
     """
     close_log()
-    current_time = datetime.datetime.now()
-    formatted_time = current_time.strftime('%Y-%m-%d-%H-%M-%S')
-    logfile_name = "Logs/log_" + formatted_time + ".log"
+    current_datetime = util.get_current_datetime()
+    logfile_name = "Logs/log_" + current_datetime + ".log"
     global logfile
     logfile = open(logfile_name, "w")
 

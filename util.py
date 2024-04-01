@@ -1,5 +1,6 @@
 from collections import Counter
 from enum import Enum
+import datetime
 
 
 class ExperimentType(Enum):
@@ -27,3 +28,13 @@ def most_common_string(strings: list[str]) -> str:
     counts = Counter(strings)
     most_common = max(counts, key=counts.get)
     return most_common
+
+
+def get_current_datetime():
+    """
+    Creates a formatted string of the current date and time
+
+    :return: current date and time as formatted string
+    """
+    current_time = datetime.datetime.now()
+    return current_time.strftime('%Y-%m-%d-%H-%M-%S')
