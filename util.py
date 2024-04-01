@@ -1,9 +1,5 @@
 from collections import Counter
 from enum import Enum
-from log_writer import LogWriter
-
-log_writer = LogWriter()
-log_writer.write("Hello WOrld")
 
 
 class ExperimentType(Enum):
@@ -15,10 +11,10 @@ class ExperimentType(Enum):
     Shuffle-Choices: shuffles label order, path is chosen through majority vote
     Combines: applies Self-Consistency and Shuffle-Choices, path is chosen through majority vote
     """
-    BASELINE = 1
-    SELF_CONSISTENCY = 2
-    CHOICE_SHUFFLING = 3
-    COMBINED = 4
+    BASELINE = "baseline"
+    SELF_CONSISTENCY = "self-consistency"
+    CHOICE_SHUFFLING = "choice-shuffling"
+    COMBINED = "combined"
 
 
 def most_common_string(strings: list[str]) -> str:
