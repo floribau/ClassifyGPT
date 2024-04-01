@@ -156,7 +156,6 @@ def classify(experiment_type: ExperimentType, test_data: pd.DataFrame, with_desc
     logwriter.write_to_log("-"*50 + "\n")
 
     result_dataset = pd.DataFrame(test_data)
-    data.save_as_csv(result_dataset, experiment_type, with_description)
     try:
         for i in test_data.index:
             product_name = result_dataset.iloc[i]['Title']
