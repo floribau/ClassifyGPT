@@ -1,4 +1,5 @@
 import util
+import os
 
 logfile = None
 
@@ -7,6 +8,8 @@ def open_log():
     """
     Opens a log file and sets the global parameter to this new log file
     """
+    if not os.path.exists("./Logs"):
+        os.makedirs("./Logs")
     close_log()
     current_datetime = util.get_current_datetime()
     logfile_name = "Logs/log_" + current_datetime + ".log"

@@ -1,5 +1,6 @@
 import pandas as pd
 import random
+import os
 import util
 from util import ExperimentType
 
@@ -237,6 +238,15 @@ def permute_labels(labels: list[str]) -> list[str]:
 
 
 def save_as_csv(df: pd.DataFrame, experiment_type: ExperimentType, with_description: bool):
+    """
+    Saves the given DataFrame as csv into the Results directory
+
+    :param df: The DataFrame to be saved as csv, should be the result of a classification experiment
+    :param experiment_type: The experiment type
+    :param with_description: States whether the experiment has been conducted with or without label definitions
+    """
+    if not os.path.exists("./Results"):
+        os.makedirs("./Results")
     results_csv_name = "Results/results_" + experiment_type.value + "_"
     if with_description:
         results_csv_name = results_csv_name + "with_descriptions_"
