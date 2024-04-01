@@ -7,7 +7,7 @@ https://doi.org/10.48550/arXiv.2203.11171) (Wang et al., 2022) and [Choice Shuff
 https://doi.org/10.48550/arXiv.2311.16452) (Nori et al., 2023) for Multiple-Choice Chain of Thought Reasoning and applies the resulting prompt to product classification.
 
 ## Installation and usage
-In order to use ClassifyGPT, you need to set your OpenAI API key in your system's environment variables: OPENAI_API_KEY = "your_api_key"
+To run ClassifyGPT, you need to set your OpenAI API key in your system's environment variables: OPENAI_API_KEY = "your_api_key"
 
 ## Acknowledgement
 This project is part of a seminar thesis under Prof Bizer during my Bachelor's degree at University of Mannheim
