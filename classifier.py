@@ -17,7 +17,8 @@ def chat_completion(title: str, brand: str, second_level_labels: list, third_lev
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": data.SYSTEM_PROMPT},
-            {"role": "user", "content": data.format_user_prompt(title, brand, second_level_labels, third_level_labels, with_definition)}
+            {"role": "user", "content": data.format_user_prompt(title, brand, second_level_labels, third_level_labels,
+                                                                with_definition)}
         ]
     )
     return response
@@ -64,8 +65,8 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
 
             while predicted_path == -1:
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
-                response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
-                                           with_description)
+                response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS,
+                                           data.THIRD_LEVEL_LABELS, with_description)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
@@ -105,7 +106,7 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
 
     elif experiment_type == ExperimentType.COMBINED:
         for i in range(N_SELF_CONSISTENCY):
-            for j in range (N_CHOICE_SHUFFLING):
+            for j in range(N_CHOICE_SHUFFLING):
                 second_level_labels_permuted = data.permute_labels(data.SECOND_LEVEL_LABELS)
                 third_level_labels_permuted = data.permute_labels(data.THIRD_LEVEL_LABELS)
 
