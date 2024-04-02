@@ -6,7 +6,7 @@ from util import ExperimentType
 
 # Dataset consisting of 50 test samples.
 # They are classified into one of 25 category paths, each category path having two samples.
-test_dataset = pd.read_csv('icecat_test_data.csv')
+test_dataset = pd.read_csv('icecat_test_data.csv', index_col="Index")
 
 # Label lists and definition for each label as specified by Icecat
 SECOND_LEVEL_LABELS = ['Computers', 'Warranty & Support', 'Software', 'TVs & Monitors', 'Data Input Devices',
