@@ -14,7 +14,19 @@ third_level_shuffled_choices = []
 
 
 def chat_completion(title: str, brand: str, second_level_labels: list, third_level_labels: list,
-                    temperature: float = 0.5, with_definition: bool = False):
+                    with_definition: bool = False, temperature: float = 0.5):
+    """
+    Creates a Chat Completion with OpenAI's GPT-3.5-TURBO-0613 model, which classifies a specified product into its
+    hierarchical category path
+
+    :param title: The product title
+    :param brand: The product brand
+    :param second_level_labels: The list of second-level labels, either in original or permuted order
+    :param third_level_labels: The list of third-level labels, either in original or permuted order
+    :param with_definition: Adds label definitions to the prompt if True, doesn't add label definitions if False
+    :param temperature: The model's temperature, used for temperature-sampling with Self-Consistency
+    :return: The created response objecr
+    """
     client = OpenAI()
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0613",
@@ -68,14 +80,14 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
                 temperature = 0.5
 
             response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
-                                       temperature, with_description)
+                                       with_description, temperature)
             response_string = response.choices[0].message.content.strip()
             predicted_path = extract_response_path(response_string)
 
             while predicted_path == -1:
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
                 response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS,
-                                           data.THIRD_LEVEL_LABELS, temperature, with_description)
+                                           data.THIRD_LEVEL_LABELS, with_description, temperature)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
@@ -119,14 +131,14 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
                 temperature = 0.5
             for j in range(N_CHOICE_SHUFFLING):
                 response = chat_completion(product_name, product_brand, second_level_shuffled_choices[j],
-                                           third_level_shuffled_choices[j], temperature, with_description)
+                                           third_level_shuffled_choices[j], with_description, temperature)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
                 while predicted_path == -1:
                     logwriter.write_to_log(f"Response path format incorrect for response: {response}")
                     response = chat_completion(product_name, product_brand, second_level_shuffled_choices[j],
-                                               third_level_shuffled_choices[j], temperature, with_description)
+                                               third_level_shuffled_choices[j], with_description, temperature)
                     response_string = response.choices[0].message.content.strip()
                     predicted_path = extract_response_path(response_string)
 
