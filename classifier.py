@@ -41,14 +41,14 @@ def chat_completion(title: str, brand: str, second_level_labels: list, third_lev
 
 
 def classify_single_row(experiment_type: ExperimentType, row_index: int, result_dataset: pandas.DataFrame,
-                        with_description: bool = False):
+                        with_definition: bool = False):
     """
     Performs single-row classification. The exact execution depends on the experiment type.
 
     :param experiment_type: The experiment type as specified in util.ExperimentType
     :param row_index: The index of the current row
     :param result_dataset: The resulting dataset. The results will be stored here
-    :param with_description: Adds label definitions to the prompt if True, doesn't add label definitions if False
+    :param with_definition: Adds label definitions to the prompt if True, doesn't add label definitions if False
     :return:
     """
     row = result_dataset.iloc[row_index]
@@ -58,14 +58,15 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
 
     if experiment_type == ExperimentType.BASELINE:
         response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
-                                   with_description)
+                                   with_definition)
         response_string = response.choices[0].message.content.strip()
         majority_path = extract_response_path(response_string)
 
         while majority_path == -1:
             logwriter.write_to_log(f"Response path format incorrect for response: {response}")
+            print("-Response path format incorrect!")
             response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
-                                       with_description)
+                                       with_definition)
             response_string = response.choices[0].message.content.strip()
             majority_path = extract_response_path(response_string)
 
@@ -80,14 +81,14 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
                 temperature = 0.5
 
             response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
-                                       with_description, temperature)
+                                       with_definition, temperature)
             response_string = response.choices[0].message.content.strip()
             predicted_path = extract_response_path(response_string)
 
             while predicted_path == -1:
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
                 response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS,
-                                           data.THIRD_LEVEL_LABELS, with_description, temperature)
+                                           data.THIRD_LEVEL_LABELS, with_definition, temperature)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
@@ -103,14 +104,14 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
         init_choice_shuffling()
         for i in range(N_CHOICE_SHUFFLING):
             response = chat_completion(product_name, product_brand, second_level_shuffled_choices[i],
-                                       third_level_shuffled_choices[i], with_description)
+                                       third_level_shuffled_choices[i], with_definition)
             response_string = response.choices[0].message.content.strip()
             predicted_path = extract_response_path(response_string)
 
             while predicted_path == -1:
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
                 response = chat_completion(product_name, product_brand, second_level_shuffled_choices[i],
-                                           third_level_shuffled_choices[i], with_description)
+                                           third_level_shuffled_choices[i], with_definition)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
@@ -131,14 +132,14 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
                 temperature = 0.5
             for j in range(N_CHOICE_SHUFFLING):
                 response = chat_completion(product_name, product_brand, second_level_shuffled_choices[j],
-                                           third_level_shuffled_choices[j], with_description, temperature)
+                                           third_level_shuffled_choices[j], with_definition, temperature)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
                 while predicted_path == -1:
                     logwriter.write_to_log(f"Response path format incorrect for response: {response}")
                     response = chat_completion(product_name, product_brand, second_level_shuffled_choices[j],
-                                               third_level_shuffled_choices[j], with_description, temperature)
+                                               third_level_shuffled_choices[j], with_definition, temperature)
                     response_string = response.choices[0].message.content.strip()
                     predicted_path = extract_response_path(response_string)
 
@@ -154,10 +155,11 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
         raise ValueError(f"Unknown experiment type {experiment_type}")
 
     logwriter.write_to_log(f"Final Response: {majority_path}\n")
+    print(f"->Done with {product_name}")
     return result_dataset
 
 
-def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_description: bool = False) \
+def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_definition: bool = False) \
         -> pandas.DataFrame:
     """
     Performs the classification for the whole dataset by calling classify_single_row() for each row.
@@ -165,12 +167,12 @@ def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_
 
     :param experiment_type: The experiment type as specified in util.ExperimentType
     :param test_data: The DataFrame containing the test data
-    :param with_description: Adds label definitions to the prompt if True, doesn't add label definitions if False
+    :param with_definition: Adds label definitions to the prompt if True, doesn't add label definitions if False
     :returns: result_dataset: The DataFrame containing the classification results
     """
     logwriter.open_log()
     logwriter.write_to_log("Starting Product Classification")
-    if with_description:
+    if with_definition:
         description_string = "with category descriptions"
     else:
         description_string = "without category descriptions"
@@ -182,11 +184,11 @@ def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_
         for i in test_data.index:
             product_name = result_dataset.iloc[i]['Title']
             logwriter.write_to_log(f"--- {product_name} ---")
-            result_dataset = classify_single_row(experiment_type, i, result_dataset, with_description)
-        data.save_results_as_csv(result_dataset, experiment_type, with_description)
+            result_dataset = classify_single_row(experiment_type, i, result_dataset, with_definition)
+        data.save_results_as_csv(result_dataset, experiment_type, with_definition)
     except Exception as e:
         logwriter.write_to_log(f"Exception caught: {e}")
-        data.save_results_as_csv(result_dataset, experiment_type, with_description)
+        data.save_results_as_csv(result_dataset, experiment_type, with_definition)
 
     return result_dataset
 
