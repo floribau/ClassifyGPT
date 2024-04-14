@@ -13,4 +13,4 @@ result_data = classifier.classify(experiment_type, test_data)
 
 # Evaluation
 # TODO Store eval results
-print(eval.eval_f1_scores(result_data['Category Path'], result_data['Category Path']))
+print(eval.eval_f1_scores(result_data['Category Path'], result_data['Predicted Path']))
