@@ -9,17 +9,21 @@ import logwriter
 N_SELF_CONSISTENCY = 5
 N_CHOICE_SHUFFLING = 5
 
+second_level_shuffled_choices = []
+third_level_shuffled_choices = []
+
 
 def chat_completion(title: str, brand: str, second_level_labels: list, third_level_labels: list,
-                    with_definition: bool = False):
+                    temperature: float = 0.5, with_definition: bool = False):
     client = OpenAI()
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-0613",
         messages=[
             {"role": "system", "content": data.SYSTEM_PROMPT},
             {"role": "user", "content": data.format_user_prompt(title, brand, second_level_labels, third_level_labels,
                                                                 with_definition)}
-        ]
+        ],
+        temperature=temperature
     )
     return response
 
@@ -58,15 +62,20 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
 
     elif experiment_type == ExperimentType.SELF_CONSISTENCY:
         for i in range(N_SELF_CONSISTENCY):
+            if N_SELF_CONSISTENCY > 1:
+                temperature = i * 1 / (N_SELF_CONSISTENCY - 1)
+            else:
+                temperature = 0.5
+
             response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
-                                       with_description)
+                                       temperature, with_description)
             response_string = response.choices[0].message.content.strip()
             predicted_path = extract_response_path(response_string)
 
             while predicted_path == -1:
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
                 response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS,
-                                           data.THIRD_LEVEL_LABELS, with_description)
+                                           data.THIRD_LEVEL_LABELS, temperature, with_description)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
@@ -79,20 +88,17 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
         result_dataset.loc[row_index, 'Predicted Path'] = majority_path
 
     elif experiment_type == ExperimentType.CHOICE_SHUFFLING:
+        init_choice_shuffling()
         for i in range(N_CHOICE_SHUFFLING):
-            second_level_labels_permuted = data.permute_labels(data.SECOND_LEVEL_LABELS)
-            third_level_labels_permuted = data.permute_labels(data.THIRD_LEVEL_LABELS)
-
-            response = chat_completion(product_name, product_brand, second_level_labels_permuted,
-                                       third_level_labels_permuted, with_description)
+            response = chat_completion(product_name, product_brand, second_level_shuffled_choices[i],
+                                       third_level_shuffled_choices[i], with_description)
             response_string = response.choices[0].message.content.strip()
             predicted_path = extract_response_path(response_string)
 
             while predicted_path == -1:
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
-                response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS,
-                                           data.THIRD_LEVEL_LABELS,
-                                           with_description)
+                response = chat_completion(product_name, product_brand, second_level_shuffled_choices[i],
+                                           third_level_shuffled_choices[i], with_description)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
@@ -105,20 +111,22 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
         result_dataset.loc[row_index, 'Predicted Path'] = majority_path
 
     elif experiment_type == ExperimentType.COMBINED:
+        init_choice_shuffling()
         for i in range(N_SELF_CONSISTENCY):
+            if N_SELF_CONSISTENCY > 1:
+                temperature = i * 1 / (N_SELF_CONSISTENCY - 1)
+            else:
+                temperature = 0.5
             for j in range(N_CHOICE_SHUFFLING):
-                second_level_labels_permuted = data.permute_labels(data.SECOND_LEVEL_LABELS)
-                third_level_labels_permuted = data.permute_labels(data.THIRD_LEVEL_LABELS)
-
-                response = chat_completion(product_name, product_brand, second_level_labels_permuted,
-                                           third_level_labels_permuted, with_description)
+                response = chat_completion(product_name, product_brand, second_level_shuffled_choices[j],
+                                           third_level_shuffled_choices[j], temperature, with_description)
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
                 while predicted_path == -1:
                     logwriter.write_to_log(f"Response path format incorrect for response: {response}")
-                    response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS,
-                                               data.THIRD_LEVEL_LABELS, with_description)
+                    response = chat_completion(product_name, product_brand, second_level_shuffled_choices[j],
+                                               third_level_shuffled_choices[j], temperature, with_description)
                     response_string = response.choices[0].message.content.strip()
                     predicted_path = extract_response_path(response_string)
 
@@ -155,7 +163,7 @@ def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_
     else:
         description_string = "without category descriptions"
     logwriter.write_to_log(f"Specifications: Experiment Type: {experiment_type}, Descriptions: {description_string}")
-    logwriter.write_to_log("-"*50 + "\n")
+    logwriter.write_to_log("-" * 50 + "\n")
 
     result_dataset = pd.DataFrame(test_data)
     try:
@@ -201,10 +209,21 @@ def set_n_self_consistency(n_self_consistency: int):
 
 
 def set_n_choice_shuffling(n_choice_shuffling: int):
-    """s
+    """
     Sets the number of choice shuffling paths
 
     :param n_choice_shuffling: number of self-consistency paths
     """
     global N_CHOICE_SHUFFLING
     N_CHOICE_SHUFFLING = n_choice_shuffling
+
+
+def init_choice_shuffling():
+    """
+    Initializes the arrays with permuted labels for choice shuffling
+    """
+    global second_level_shuffled_choices
+    global third_level_shuffled_choices
+    for i in range(N_CHOICE_SHUFFLING):
+        second_level_shuffled_choices.append(data.permute_labels(data.SECOND_LEVEL_LABELS))
+        third_level_shuffled_choices.append(data.permute_labels(data.THIRD_LEVEL_LABELS))
