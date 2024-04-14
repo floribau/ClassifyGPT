@@ -25,7 +25,7 @@ def chat_completion(title: str, brand: str, second_level_labels: list, third_lev
     :param third_level_labels: The list of third-level labels, either in original or permuted order
     :param with_definition: Adds label definitions to the prompt if True, doesn't add label definitions if False
     :param temperature: The model's temperature, used for temperature-sampling with Self-Consistency
-    :return: The created response objecr
+    :return: The created response object
     """
     client = OpenAI()
     response = client.chat.completions.create(
