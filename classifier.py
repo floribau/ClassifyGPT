@@ -212,6 +212,7 @@ def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_
         logwriter.write_to_log(f"Exception caught: {e}")
         data.save_results_as_csv(result_dataset, experiment_type, with_definition)
 
+    logwriter.close_log()
     return result_dataset
 
 
