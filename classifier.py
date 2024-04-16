@@ -75,7 +75,6 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
             response_string = response.choices[0].message.content.strip()
             majority_path = extract_response_path(response_string)
 
-        print(majority_path)
         result_dataset.loc[row_index, 'Predicted Path'] = majority_path
         result_dataset.loc[row_index, 'Response'] = response_string
 
@@ -124,7 +123,6 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
             while predicted_path == -1:
                 loop_counter += 1
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
-                print(">>Response path format incorrect!")
                 if loop_counter >= 5:
                     response_string = "RESPONSE PATH FORMAT INCORRECT"
                     predicted_path = "None>None>None"
@@ -180,7 +178,6 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
         raise ValueError(f"Unknown experiment type {experiment_type}")
 
     logwriter.write_to_log(f"Final Response: {majority_path}\n")
-    print()
     return result_dataset
 
 
@@ -209,7 +206,6 @@ def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_
         for i in test_data.index:
             product_name = result_dataset.iloc[i]['Title']
             logwriter.write_to_log(f"--- {product_name} ---")
-            print(f"--- {product_name} ---")
             result_dataset = classify_single_row(experiment_type, i, result_dataset, with_definition)
         data.save_results_as_csv(result_dataset, experiment_type, with_definition)
     except Exception as e:
