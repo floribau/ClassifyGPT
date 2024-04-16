@@ -16,7 +16,7 @@ third_level_shuffled_choices = []
 def chat_completion(title: str, brand: str, second_level_labels: list, third_level_labels: list,
                     with_definition: bool = False, temperature: float = 0.5):
     """
-    Creates a Chat Completion with OpenAI's GPT-3.5-TURBO-0613 model, which classifies a specified product into its
+    Creates a Chat Completion with OpenAI's GPT-3.5-TURBO model, which classifies a specified product into its
     hierarchical category path
 
     :param title: The product title
@@ -29,7 +29,7 @@ def chat_completion(title: str, brand: str, second_level_labels: list, third_lev
     """
     client = OpenAI()
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0613",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": data.SYSTEM_PROMPT},
             {"role": "user", "content": data.format_user_prompt(title, brand, second_level_labels, third_level_labels,
@@ -62,14 +62,20 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
         response_string = response.choices[0].message.content.strip()
         majority_path = extract_response_path(response_string)
 
+        loop_counter = 0
         while majority_path == -1:
+            loop_counter += 1
             logwriter.write_to_log(f"Response path format incorrect for response: {response}")
-            print("-Response path format incorrect!")
+            if loop_counter >= 5:
+                response_string = "RESPONSE PATH FORMAT INCORRECT"
+                majority_path = "None>None>None"
+                break
             response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS, data.THIRD_LEVEL_LABELS,
                                        with_definition)
             response_string = response.choices[0].message.content.strip()
             majority_path = extract_response_path(response_string)
 
+        print(majority_path)
         result_dataset.loc[row_index, 'Predicted Path'] = majority_path
         result_dataset.loc[row_index, 'Response'] = response_string
 
@@ -85,8 +91,14 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
             response_string = response.choices[0].message.content.strip()
             predicted_path = extract_response_path(response_string)
 
+            loop_counter = 0
             while predicted_path == -1:
+                loop_counter += 1
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
+                if loop_counter >= 5:
+                    response_string = "RESPONSE PATH FORMAT INCORRECT"
+                    predicted_path = "None>None>None"
+                    break
                 response = chat_completion(product_name, product_brand, data.SECOND_LEVEL_LABELS,
                                            data.THIRD_LEVEL_LABELS, with_definition, temperature)
                 response_string = response.choices[0].message.content.strip()
@@ -108,8 +120,15 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
             response_string = response.choices[0].message.content.strip()
             predicted_path = extract_response_path(response_string)
 
+            loop_counter = 0
             while predicted_path == -1:
+                loop_counter += 1
                 logwriter.write_to_log(f"Response path format incorrect for response: {response}")
+                print(">>Response path format incorrect!")
+                if loop_counter >= 5:
+                    response_string = "RESPONSE PATH FORMAT INCORRECT"
+                    predicted_path = "None>None>None"
+                    break
                 response = chat_completion(product_name, product_brand, second_level_shuffled_choices[i],
                                            third_level_shuffled_choices[i], with_definition)
                 response_string = response.choices[0].message.content.strip()
@@ -136,8 +155,14 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
                 response_string = response.choices[0].message.content.strip()
                 predicted_path = extract_response_path(response_string)
 
+                loop_counter = 0
                 while predicted_path == -1:
+                    loop_counter += 1
                     logwriter.write_to_log(f"Response path format incorrect for response: {response}")
+                    if loop_counter >= 5:
+                        response_string = "RESPONSE PATH FORMAT INCORRECT"
+                        predicted_path = "None>None>None"
+                        break
                     response = chat_completion(product_name, product_brand, second_level_shuffled_choices[j],
                                                third_level_shuffled_choices[j], with_definition, temperature)
                     response_string = response.choices[0].message.content.strip()
@@ -155,7 +180,7 @@ def classify_single_row(experiment_type: ExperimentType, row_index: int, result_
         raise ValueError(f"Unknown experiment type {experiment_type}")
 
     logwriter.write_to_log(f"Final Response: {majority_path}\n")
-    print(f"->Done with {product_name}")
+    print()
     return result_dataset
 
 
@@ -184,6 +209,7 @@ def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_
         for i in test_data.index:
             product_name = result_dataset.iloc[i]['Title']
             logwriter.write_to_log(f"--- {product_name} ---")
+            print(f"--- {product_name} ---")
             result_dataset = classify_single_row(experiment_type, i, result_dataset, with_definition)
         data.save_results_as_csv(result_dataset, experiment_type, with_definition)
     except Exception as e:
