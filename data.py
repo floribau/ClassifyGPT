@@ -36,7 +36,7 @@ LABEL_DEFINITIONS = {
     'TVs & Monitors': "Television sets and computer displays used for visual entertainment or as output devices for "
                       "computers. TVs receive and display broadcast signals, while monitors are specifically designed "
                       "for computer output.",
-    'Data Input Devices': "Input devices that allow for user inputs to a computer, e.g., keyboard and joystick.",
+    'Data Input Devices': "Devices that feed data into a computer e.g. keyboard, joystick",
     'Computer Cables': "Cables used to connect computers to power supplies and other devices such as printers.",
     'Telecom & Navigation': "Portable computer devices and phones, and their accessories such as cables and stands.",
     'Batteries & Power Supplies': "Battery units and devices used to power electronic equipment, providing portable "
