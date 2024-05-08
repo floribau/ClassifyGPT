@@ -8,6 +8,7 @@ import logwriter
 
 N_SELF_CONSISTENCY = 5
 N_CHOICE_SHUFFLING = 5
+GPT_MODEL = "gpt-3.5-turbo"
 
 second_level_shuffled_choices = []
 third_level_shuffled_choices = []
@@ -29,7 +30,7 @@ def chat_completion(title: str, brand: str, second_level_labels: list, third_lev
     """
     client = OpenAI()
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model=GPT_MODEL,
         messages=[
             {"role": "system", "content": data.SYSTEM_PROMPT},
             {"role": "user", "content": data.format_user_prompt(title, brand, second_level_labels, third_level_labels,
@@ -198,7 +199,8 @@ def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_
         description_string = "with category descriptions"
     else:
         description_string = "without category descriptions"
-    logwriter.write_to_log(f"Specifications: Experiment Type: {experiment_type}, Descriptions: {description_string}")
+    logwriter.write_to_log(f"Specifications: Experiment Type: {experiment_type}, Descriptions: {description_string}, "
+                           f"GPT model: {GPT_MODEL}")
     logwriter.write_to_log("-" * 50 + "\n")
 
     result_dataset = pd.DataFrame(test_data)
@@ -207,6 +209,7 @@ def classify(experiment_type: ExperimentType, test_data: pandas.DataFrame, with_
             product_name = result_dataset.iloc[i]['Title']
             logwriter.write_to_log(f"--- {product_name} ---")
             result_dataset = classify_single_row(experiment_type, i, result_dataset, with_definition)
+            print(f"Round {i} done")
         data.save_results_as_csv(result_dataset, experiment_type, with_definition)
     except Exception as e:
         logwriter.write_to_log(f"Exception caught: {e}")
@@ -253,6 +256,16 @@ def set_n_choice_shuffling(n_choice_shuffling: int):
     """
     global N_CHOICE_SHUFFLING
     N_CHOICE_SHUFFLING = n_choice_shuffling
+
+
+def set_gpt_model(gpt_model: str = "gpt-3.5-turbo"):
+    """
+    Sets the GPT model that should be used for the classification task
+
+    :param gpt_model: The GPT model, default: gpt-3.5-turbo (references to gpt-3.5-turbo-0125 as of 2024-05-08)
+    """
+    global GPT_MODEL
+    GPT_MODEL = gpt_model
 
 
 def init_choice_shuffling():
