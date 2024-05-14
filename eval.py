@@ -1,5 +1,6 @@
 import pandas
 from sklearn.metrics import f1_score
+from statsmodels.stats.contingency_tables import mcnemar
 
 
 def micro_f1_score(y_true: pandas.Series, y_pred: pandas.Series) -> float:
@@ -56,3 +57,25 @@ def eval_f1_scores(paths_true: pandas.Series, paths_pred: pandas.Series) -> dict
         return result_dict
     except IndexError as e:
         raise Exception(f"Incorrect path format: {e}")
+
+
+def mcnemar_test(predictions1: list[str], predictions2: list[str]) -> float:
+    """
+    Performs a McNemar test on two given list of predictions. Used to test whether there's a difference in performance between the different approaches
+
+    :param predictions1: the first list of category (or category path) predictions
+    :param predictions2: the second list of category (or category path) predictions
+    :return: the p-value calculated by the McNemar test
+    """
+    table = [[0, 0], [0, 0]]
+    for pred1, pred2 in zip(predictions1, predictions2):
+        if pred1 and pred2:
+            table[0][0] += 1
+        elif pred1 and not pred2:
+            table[0][1] += 1
+        elif not pred1 and pred2:
+            table[1][0] += 1
+        else:
+            table[1][1] += 1
+    result = mcnemar(table, exact=False)
+    return result.pvalue
