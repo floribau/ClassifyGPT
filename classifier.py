@@ -14,7 +14,7 @@ second_level_shuffled_choices = []
 third_level_shuffled_choices = []
 
 
-def chat_completion(title: str, brand: str, second_level_labels: list, third_level_labels: list,
+def chat_completion(title: str, brand: str, second_level_labels: list[str], third_level_labels: list[str],
                     with_definition: bool = False, temperature: float = 0.5):
     """
     Creates a Chat Completion with OpenAI's GPT-3.5-TURBO model, which classifies a specified product into its
