@@ -124,21 +124,18 @@ LABEL_DEFINITIONS = {
 SYSTEM_PROMPT = ("You are tasked with classifying products within a hierarchical category structure consisting of "
                  "three levels. All products fall under the overarching first-level category 'Computers & "
                  "Electronics.' Your role is to utilize your expertise to categorize the products effectively into "
-                 "their second and third level categories, considering their attributes, intended use, and notable "
-                 "features. The classification involves predicting the second-level and third-level categories from "
-                 "two provided category pools. Your response should not only provide the classification path but also"
-                 "explain the reasoning behind your decision. "
-                 "Please provide, alongside your reasoning, your answer for the hierarchical path in the format "
-                 "\"Computers & Electronics>[Second-level Category]>[Third-level Category]\". [Second-level Category] "
-                 "and [Third-level Category] are placeholders for the predicted categories on the second and third "
-                 "level. Only use categories from the second-level pool to fill the [Second-level Category] "
-                 "placeholder. Only use categories from the third-level pool to fill the [Third-level Category] "
-                 "placeholder.")
+                 "their second and third level categories, considering their intended use and notable features. "
+                 "The classification involves predicting the second-level and third-level categories from "
+                 "two provided category pools. "
+                 "Please explain your reasoning behind your decision and provide your answer for the hierarchical "
+                 "path in the format \"Computers & Electronics>[Second-level Category]>[Third-level Category]\" by "
+                 "filling the [Second-level Category] with a category from the second-level pool and the [Third-level "
+                 "Category] with a category from the third-level pool.")
 
 # User Prompt Templates to be filled with product and label input
 USER_PROMPT_TEMPLATE_1 = ("The product to be classified is \"{title}\" of the brand {brand}.\n"
                           "Please classify the specified product into the described product hierarchy. "
-                          "Fill the placeholder [Second-level Category] with a category of this second-level pool: "
+                          "Fill the [Second-level Category] with a category of this second-level pool: "
                           "{label_2_1}, {label_2_2}, {label_2_3}, {label_2_4}, {label_2_5}, "
                           "{label_2_6}, {label_2_7}, {label_2_8}, {label_2_9}, {label_2_10}.\n")
 
@@ -154,7 +151,7 @@ USER_PROMPT_TEMPLATE_2 = ("Use the following definitions for the second-level ca
                           "- {label_2_9}: {definition_2_9}\n"
                           "- {label_2_10}: {definition_2_10}\n")
 
-USER_PROMPT_TEMPLATE_3 = ("Fill the placeholder [Third-level Category] with a category from this third-level pool: "
+USER_PROMPT_TEMPLATE_3 = ("Fill the [Third-level Category] with a category from this third-level pool: "
                           "{label_3_1}, {label_3_2}, {label_3_3}, {label_3_4}, {label_3_5}, {label_3_6}, "
                           "{label_3_7}, {label_3_8}, {label_3_9}, {label_3_10}, {label_3_11}, {label_3_12}, "
                           "{label_3_13}, {label_3_14}, {label_3_15}, {label_3_16}, {label_3_17}, {label_3_18}, "
