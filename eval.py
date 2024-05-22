@@ -60,7 +60,7 @@ def eval_f1_scores(paths_true: pandas.Series, paths_pred: pandas.Series) -> dict
         raise Exception(f"Incorrect path format: {e}")
 
 
-def mcnemar_test(gold_standard: list[str], predictions1: list[str], predictions2: list[str]) -> float:
+def mcnemar_test(gold_standard: list[str], predictions1: list[str], predictions2: list[str], exact: bool = None) -> float:
     """
     Performs a McNemar's test on two given list of predictions. Used to test whether there's a difference in performance between the different approaches
 
@@ -81,7 +81,11 @@ def mcnemar_test(gold_standard: list[str], predictions1: list[str], predictions2
             table[1][0] += 1
         else:
             table[1][1] += 1
-    result = mcnemar(table, exact=False)
+    if exact is None:
+        exact = True
+        if table[0][1] + table[1][0] >= 25:
+            exact = False
+    result = mcnemar(table, exact=exact)
     return result.pvalue
 
 
