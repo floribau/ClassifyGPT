@@ -60,13 +60,15 @@ def eval_f1_scores(paths_true: pandas.Series, paths_pred: pandas.Series) -> dict
         raise Exception(f"Incorrect path format: {e}")
 
 
-def mcnemar_test(gold_standard: list[str], predictions1: list[str], predictions2: list[str], exact: bool = None) -> float:
+def mcnemar_test(gold_standard: list[str], predictions1: list[str], predictions2: list[str], exact: bool = None) \
+        -> float:
     """
     Performs a McNemar's test on two given list of predictions. Used to test whether there's a difference in performance between the different approaches
 
     :param gold_standard: the gold standard, i.e., list of correct categories (or category paths)
     :param predictions1: the first list of category (or category path) predictions
     :param predictions2: the second list of category (or category path) predictions
+    :param exact: determines whether an exact binomial distribution (if True) or an approximated chi-squared distribution (if False) is used as the test statistic. If not set, the value for exact is calculated based on a threshold
     :return: the p-value calculated by the McNemar test
     """
     table = [[0, 0], [0, 0]]
