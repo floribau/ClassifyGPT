@@ -10,4 +10,4 @@ https://doi.org/10.48550/arXiv.2311.16452) (Nori et al., 2023) for Multiple-Choi
 To run ClassifyGPT, you need to set your OpenAI API key in your system's environment variables: OPENAI_API_KEY = "your_api_key"
 
 ## Acknowledgement
-This project is part of a seminar thesis under Prof. Bizer during my Bachelor's degree at University of Mannheim. My final paper can be found [here](https://drive.google.com/file/d/1VCKlb90dGaBnrkdM7_qPaKScDbvVhGhJ/view?usp=sharing).
+This project is part of a seminar thesis under Prof. Bizer during my Bachelor's degree at University of Mannheim.
